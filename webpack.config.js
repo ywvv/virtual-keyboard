@@ -17,6 +17,7 @@ const config = {
   plugins: [
     new HtmlWebpackPlugin({
       template: 'src/index.html',
+      favicon: './src/favicon.ico',
     }),
     new CleanWebpackPlugin(),
   ],
