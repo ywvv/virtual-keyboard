@@ -1,4 +1,4 @@
-import './style.scss';
+import './style.css';
 
 const KEY_EVENT_CODES = [
   'Backquote', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7',
