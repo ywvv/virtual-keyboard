@@ -16,7 +16,7 @@ const config = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: 'index.html',
+      template: 'src/index.html',
     }),
     new CleanWebpackPlugin(),
   ],
@@ -28,7 +28,7 @@ const config = {
       },
       {
         test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,
-        type: 'asset',
+        type: 'asset/resource',
       },
     ],
   },
