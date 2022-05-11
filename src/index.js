@@ -140,18 +140,17 @@ class Keyboard {
         return KEYS_EN_CAPS_SHIFT[i];
       }
       return KEYS_EN[i];
-    } else {
-      if (this.isShift === true) {
-        return KEYS_RUS_SHIFT[i];
-      }
-      if (this.isCaps === true) {
-        return KEYS_RUS_CAPS[i];
-      }
-      if (this.isCapsShift === true) {
-        return KEYS_RUS_CAPS_SHIFT[i];
-      }
-      return KEYS_RUS[i];
     }
+    if (this.isShift === true) {
+      return KEYS_RUS_SHIFT[i];
+    }
+    if (this.isCaps === true) {
+      return KEYS_RUS_CAPS[i];
+    }
+    if (this.isCapsShift === true) {
+      return KEYS_RUS_CAPS_SHIFT[i];
+    }
+    return KEYS_RUS[i];
   }
 
   addListeners() {
@@ -451,7 +450,7 @@ class Keyboard {
         this.keys[i].innerHTML = this.checkLang(i);
       }
     }
-    if (this.isCaps === true && event.key	=== 'Shift') {
+    if (this.isCaps === true && event.key === 'Shift') {
       this.isCaps = false;
       this.isShift = false;
       this.isCapsShift = true;
@@ -469,7 +468,7 @@ class Keyboard {
         key.classList.remove('active');
       }
     });
-    if (this.isCapsShift === true && event.key	=== 'Shift') {
+    if (this.isCapsShift === true && event.key === 'Shift') {
       this.isCaps = true;
       this.isShift = false;
       this.isCapsShift = false;
@@ -477,7 +476,7 @@ class Keyboard {
         this.keys[i].innerHTML = this.checkLang(i);
       }
     }
-    if (event.key	=== 'Shift') {
+    if (event.key === 'Shift') {
       this.isShift = false;
       for (let i = 0; i < this.keys.length; i += 1) {
         this.keys[i].innerHTML = this.checkLang(i);
