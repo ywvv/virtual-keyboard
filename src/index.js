@@ -33,9 +33,9 @@ const KEYS_EN_SHIFT = [
 
 const KEYS_EN_CAPS_SHIFT = [
   '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', 'Backspace',
-  'Tab', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\', 'Del',
-  'Caps Lock', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', "'", 'Enter',
-  'Shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', '&uarr;', 'Shift',
+  'Tab', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '{', '}', '|', 'Del',
+  'Caps Lock', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ':', '"', 'Enter',
+  'Shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', '<', '>', '?', '&uarr;', 'Shift',
   'Ctrl', 'Win', 'Alt', 'Space', 'Alt', '&larr;', '&darr;', '&rarr;', 'EN'];
 
 const KEYS_RUS = [
@@ -61,7 +61,7 @@ const KEYS_RUS_CAPS = [
 
 const KEYS_RUS_CAPS_SHIFT = [
   'ё', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', 'Backspace',
-  'Tab', 'й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ', '\\', 'Del',
+  'Tab', 'й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ', '/', 'Del',
   'Caps Lock', 'ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э', 'Enter',
   'Shift', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', '/', '&uarr;', 'Shift',
   'Ctrl', 'Win', 'Alt', 'Space', 'Alt', '&larr;', '&darr;', '&rarr;', 'RU'];
@@ -71,7 +71,7 @@ class Keyboard {
     this.isShift = false;
     this.isCaps = false;
     this.isCapsShift = false;
-    this.lang = localStorage.getItem('language') === 'en' ? 'en' : 'ru';
+    this.lang = localStorage.getItem('language') || 'ru';
     this.cursorPosition = null;
     this.letterInString = null;
     this.indexInString = null;
@@ -128,30 +128,30 @@ class Keyboard {
   }
 
   checkLang(i) {
-    if (this.isShift === true) {
-      if (this.lang === 'en') {
+    localStorage.setItem('language', this.lang);
+    if (this.lang === 'en') {
+      if (this.isShift === true) {
         return KEYS_EN_SHIFT[i];
       }
-      return KEYS_RUS_SHIFT[i];
-    }
-    if (this.isCaps === true) {
-      if (this.lang === 'en') {
+      if (this.isCaps === true) {
         return KEYS_EN_CAPS[i];
       }
-      return KEYS_RUS_CAPS[i];
-    }
-    if (this.isCapsShift === true) {
-      if (this.lang === 'en') {
+      if (this.isCapsShift === true) {
         return KEYS_EN_CAPS_SHIFT[i];
       }
-      return KEYS_RUS_CAPS_SHIFT[i];
-    }
-    if (this.lang === 'en') {
-      localStorage.setItem('language', this.lang);
       return KEYS_EN[i];
+    } else {
+      if (this.isShift === true) {
+        return KEYS_RUS_SHIFT[i];
+      }
+      if (this.isCaps === true) {
+        return KEYS_RUS_CAPS[i];
+      }
+      if (this.isCapsShift === true) {
+        return KEYS_RUS_CAPS_SHIFT[i];
+      }
+      return KEYS_RUS[i];
     }
-    localStorage.setItem('language', this.lang);
-    return KEYS_RUS[i];
   }
 
   addListeners() {
@@ -184,11 +184,7 @@ class Keyboard {
         this.textarea.value = (this.textarea.value).split('').filter((char, index) => index !== this.cursorPosition).join('');
         break;
       case 'CapsLock':
-        if (this.isCaps === false) {
-          this.isCaps = true;
-        } else {
-          this.isCaps = false;
-        }
+        this.isCaps = !this.isCaps;
         for (let i = 0; i < this.keys.length; i += 1) {
           this.keys[i].innerHTML = this.checkLang(i);
         }
@@ -286,6 +282,14 @@ class Keyboard {
         this.textarea.value = `${this.textarea.value.slice(0, this.cursorPosition)}${key.textContent}${this.textarea.value.slice(this.cursorPosition)}`;
         this.cursorPosition += 1;
     }
+    if (this.isCaps === true && (key.dataset.code === 'ShiftLeft' || key.dataset.code === 'ShiftRight')) {
+      this.isCaps = false;
+      this.isShift = false;
+      this.isCapsShift = true;
+      for (let i = 0; i < this.keys.length; i += 1) {
+        this.keys[i].innerHTML = this.checkLang(i);
+      }
+    }
     this.updateCursorPosition();
     this.textarea.focus();
   }
@@ -307,6 +311,14 @@ class Keyboard {
       default:
         break;
     }
+    if (this.isCapsShift === true && (key.dataset.code === 'ShiftLeft' || key.dataset.code === 'ShiftRight')) {
+      this.isCaps = true;
+      this.isShift = false;
+      this.isCapsShift = false;
+      for (let i = 0; i < this.keys.length; i += 1) {
+        this.keys[i].innerHTML = this.checkLang(i);
+      }
+    }
     this.textarea.focus();
   }
 
@@ -314,7 +326,9 @@ class Keyboard {
     event.preventDefault();
     this.keys.forEach((key) => {
       if (key.dataset.code === event.code) {
-        key.classList.add('active');
+        if (event.code !== 'CapsLock') {
+          key.classList.add('active');
+        }
         switch (key.dataset.code) {
           case 'Space':
             this.textarea.value = `${this.textarea.value.slice(0, this.cursorPosition)} ${this.textarea.value.slice(this.cursorPosition)}`;
@@ -338,22 +352,23 @@ class Keyboard {
             this.textarea.value = (this.textarea.value).split('').filter((char, index) => index !== this.cursorPosition).join('');
             break;
           case 'ShiftLeft':
-            this.isShift = true;
+            this.isShift = !this.isCapsShift;
             for (let i = 0; i < this.keys.length; i += 1) {
               this.keys[i].innerHTML = this.checkLang(i);
             }
             break;
           case 'ShiftRight':
-            this.isShift = true;
+            this.isShift = !this.isCapsShift;
             for (let i = 0; i < this.keys.length; i += 1) {
               this.keys[i].innerHTML = this.checkLang(i);
             }
             break;
           case 'CapsLock':
-            this.isCaps = true;
+            this.isCaps = !this.isCaps;
             for (let i = 0; i < this.keys.length; i += 1) {
               this.keys[i].innerHTML = this.checkLang(i);
             }
+            key.classList.toggle('active');
             break;
           case 'ArrowUp':
             this.countLetterInString();
@@ -436,31 +451,34 @@ class Keyboard {
         this.keys[i].innerHTML = this.checkLang(i);
       }
     }
+    if (this.isCaps === true && event.key	=== 'Shift') {
+      this.isCaps = false;
+      this.isShift = false;
+      this.isCapsShift = true;
+      for (let i = 0; i < this.keys.length; i += 1) {
+        this.keys[i].innerHTML = this.checkLang(i);
+      }
+    }
     this.textarea.focus();
   }
 
   onKeyUp(event) {
     event.preventDefault();
     this.keys.forEach((key) => {
-      if (key.dataset.code === event.code) {
+      if (key.dataset.code === event.code && key.dataset.code !== 'CapsLock') {
         key.classList.remove('active');
       }
     });
-    if (this.isCapsShift === true && event.code === 'ShiftLeft') {
+    if (this.isCapsShift === true && event.key	=== 'Shift') {
       this.isCaps = true;
+      this.isShift = false;
       this.isCapsShift = false;
       for (let i = 0; i < this.keys.length; i += 1) {
         this.keys[i].innerHTML = this.checkLang(i);
       }
     }
-    if (event.code === 'ShiftLeft' || event.code === 'ShiftRight') {
+    if (event.key	=== 'Shift') {
       this.isShift = false;
-      for (let i = 0; i < this.keys.length; i += 1) {
-        this.keys[i].innerHTML = this.checkLang(i);
-      }
-    }
-    if (event.code === 'CapsLock') {
-      this.isCaps = false;
       for (let i = 0; i < this.keys.length; i += 1) {
         this.keys[i].innerHTML = this.checkLang(i);
       }
